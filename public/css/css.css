@@ -115,3 +115,29 @@ body {
     border: 1px solid white;
     text-decoration: none;
 }
+
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: dimgray;
+}
+.search {
+    width: 300px;
+    height: 30px;
+    border: 3px solid white;
+}
+.searchLogo {
+    width: 30px;
+    height: 30px;
+    float: right;
+    border: 3px solid white;
+    box-sizing: border-box;
+}
+.search-error-container {
+    margin: 5% auto 0 auto;
+}
+.error {
+    color: red;
+    margin: 10px 0 10px 0;
+}

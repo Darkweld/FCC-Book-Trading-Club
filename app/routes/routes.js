@@ -75,6 +75,12 @@ module.exports = function(app, passport) {
 });
 
 
+    app.route('/books')
+        .get(server.booksLogin);
+
+    app.route('/bookSearch')
+        .get(server.bookSearch);
+
 
 
 

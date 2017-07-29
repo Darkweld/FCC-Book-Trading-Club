@@ -1,6 +1,85 @@
 'use strict';
 
 var User = require('../models/user');
+var Books = require('../models/books');
+var https = require('https');
+
+function apiBookRequest(val) {
+	return new Promise(function (resolve, reject) {
+		var options = {
+    	hostname: 'www.googleapis.com',
+    	path: '/books/v1/volumes?q=' + val + '&maxResults=40&printType=books&projection=lite'
+		 },
+    
+	   apiServerRequest = https.request(options, function(response) {
+    	var json = "";
+    	response.on('data', function(data) {
+    		json += data;
+    	});
+    	response.on('end', function() {
+    		json = JSON.parse(json);
+    		var count = 0;
+    		var arr = [];
+    		for (var i in json.items) {
+    			arr[count] = {
+    				title: json.items[i].volumeInfo.title,
+    				authors: json.items[i].volumeInfo.authors,
+    				image: json.items[i].volumeInfo.imageLinks.thumbnail,
+    			};
+    			count++;
+    			
+    		}
+    		resolve(arr);
+  
+    	});
+    	response.on('error', function(err) {
+    		reject(err);
+    	});
+	  });
+    
+    apiServerRequest.end();
+    	
+    	
+    	
+});
+}
+function findBooks (array) {
+	return new Promise(function(resolve, reject) {
+		
+	var arr = [];
+	
+	for (var i = 0, l = array.length; i < l; i++) {
+		arr[i] = array[i].title;
+	}
+	
+	Books
+		.find({'title': {$in: arr}})
+		.exec(function(err, doc) {
+			if (err) throw err;
+			
+			if (!doc.length) {
+				resolve(array);
+			}
+			
+			for (var j = 0, l = doc.length; j < l; j++) {
+				if (arr.indexOf(doc[j].title) !== -1) {
+					array[arr.indexOf(doc[j].title)] = doc[j];
+				}
+			}
+			
+			resolve(array);
+			
+		});
+	
+		
+	});
+
+}
+
+
+
+
+
 
 function server (passport) {
 	this
@@ -85,12 +164,48 @@ function server (passport) {
 				res.redirect('/index');
 			});
 	};
+	
+	this.booksLogin = function(req, res) {
+		res.render('books', {user: req.user});
+		
+		
+		
+		
+		
+		
+	};
+    
+    
+    this.bookSearch = function(req, res) {
+    	
+    	if (!req.query.q) {
+    		return res.json({'error': 'please enter a book name'});
+    	}
+    	
+    	var test = req.query.q;
+    	
+    	if (/[^a-zA-Z0-9\ \-\_\.]|^[\ \-\_\.]|[\ \-\_]$|[\ \-\_\.]{2,}?/g.test(test)) {
+    		return res.json({'error': 'please enter a valid book name'});
+    	}
+    	
+    	test = test.replace(/\ /, "+");
+		
+    	
+    	apiBookRequest(test).then(function(resolve) {
+    		findBooks(resolve).then(function(val) {
+    			
+    		res.json(val);
+    			
+    		});
+    	}).catch(function(reason) {
+    		console.log('error in api call, reason: ' + reason);
+    	});
     
     
     
     
     
-    
+    }; 
     
     
     
