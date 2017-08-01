@@ -141,3 +141,20 @@ body {
     color: red;
     margin: 10px 0 10px 0;
 }
+.main-book-container {
+    width: 80%;
+    margin: 10px auto 0 auto;
+}
+.book-container {
+    background-color: navy;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: wrap;
+}
+.bookDiv {
+    background-color: white;
+    width: 200px;
+    height: 300px;
+    margin: 10px;
+}

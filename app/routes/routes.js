@@ -80,7 +80,9 @@ module.exports = function(app, passport) {
 
     app.route('/bookSearch')
         .get(server.bookSearch);
-
+        
+    app.route('/addBook')
+        .post(server.addBook);
 
 
 

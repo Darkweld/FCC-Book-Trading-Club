@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var Books = new Schema({
+    bookId: String,
     title: String,
     authors: Array,
     image: String,

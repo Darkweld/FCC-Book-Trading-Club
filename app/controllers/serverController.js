@@ -22,9 +22,10 @@ function apiBookRequest(val) {
     		var arr = [];
     		for (var i in json.items) {
     			arr[count] = {
+    				bookId: json.items[i].id,
     				title: json.items[i].volumeInfo.title,
     				authors: json.items[i].volumeInfo.authors,
-    				image: json.items[i].volumeInfo.imageLinks.thumbnail,
+    				image: json.items[i].volumeInfo.imageLinks.thumbnail.replace(/http/, 'https')
     			};
     			count++;
     			
@@ -49,13 +50,15 @@ function findBooks (array) {
 	var arr = [];
 	
 	for (var i = 0, l = array.length; i < l; i++) {
-		arr[i] = array[i].title;
+		arr[i] = array[i].bookId;
 	}
 	
 	Books
-		.find({'title': {$in: arr}})
+		.find({'bookID': {$in: arr}})
 		.exec(function(err, doc) {
 			if (err) throw err;
+			
+			console.log(doc + "length: " + doc.length);
 			
 			if (!doc.length) {
 				resolve(array);
@@ -63,9 +66,11 @@ function findBooks (array) {
 			
 			for (var j = 0, l = doc.length; j < l; j++) {
 				if (arr.indexOf(doc[j].title) !== -1) {
-					array[arr.indexOf(doc[j].title)] = doc[j];
+					array.splice(j, 1);
 				}
 			}
+			
+			array = {ownedBooks: doc, unownedBooks: array};
 			
 			resolve(array);
 			
@@ -198,15 +203,18 @@ function server (passport) {
     			
     		});
     	}).catch(function(reason) {
-    		console.log('error in api call, reason: ' + reason);
+    		res.json({error: 'error in api call, reason: ' + reason});
     	});
-    
-    
-    
-    
-    
+
     }; 
     
+    this.addBook = function(req, res) {
+		
+		console.log(req.query);
+    	
+    	res.json({hello:'hello'});
+    	
+    };
     
     
     
