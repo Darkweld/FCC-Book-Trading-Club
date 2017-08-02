@@ -89,6 +89,7 @@ function findBooks (array) {
 function server (passport) {
 	this
 		.checkTokens = function(req, res){
+			console.log(req.user);
 			var obj = (req.user).toObject();
 		if	(obj.tokens) return res.render('profile', { user: req.user });
 		req.logout();
@@ -212,7 +213,39 @@ function server (passport) {
 		
 		console.log(req.query);
     	
-    	res.json({hello:'hello'});
+    	User
+			.findOne({'_id': req.user._id}).exec()
+			.then(function(doc) {
+				console.log(doc);
+				if (doc.books.length >= 5) return res.json({'error': "you may not have more than 5 books at a time. Remove or trade with others!"});
+				Books
+					.findOne({'bookId': req.query.bookId})
+					.exec(function(err, result){
+						if (err) throw err;
+						if (result) return res.json({'error': "that book is already claimed"});
+						var book = new Books({
+							bookId: req.query.bookId,
+							title: req.query.title,
+							authors: [req.query.authors],
+							image: req.query.image,
+							user: req.user._id
+						});
+						book.save().then(function(bookDoc) {
+							User.update({'_id': req.user._id}, {$push: {books :bookDoc._id}})
+							.exec(function(err, userDoc) {
+								console.log(userDoc);
+								res.json({'query':'completed'});
+							});
+							
+						}).catch(function(reason) {
+				console.log('error in book saving function, reason: ' + reason);
+			});
+						
+					});
+			}).catch(function(reason) {
+				console.log('error in book saving function, reason: ' + reason);
+			})
+		
     	
     };
     

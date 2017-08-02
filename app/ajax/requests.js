@@ -1,6 +1,6 @@
 'use strict';
 
-var mainUrl = "https://book-trading-club-darkweld.c9users.io"
+var mainUrl = "http://localhost:3000"
 
 var xhttp = {
    ready: function ready (fn) {

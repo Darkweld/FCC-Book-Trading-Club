@@ -49,7 +49,6 @@
                 if (array[i].authors) {
                     url += '&authors=' + array[i].authors;
                 }
-                console.log(url);
                div.addEventListener('click', function(event) {
                    xhttp.request('POST', url, function(response) {
                         console.log(response);
