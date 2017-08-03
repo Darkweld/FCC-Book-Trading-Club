@@ -28,6 +28,7 @@ var User = new Schema({
     twitter: String,
     facebook: String
    },
+   localUsername: String,
    books: [{type: Schema.Types.ObjectId, ref: 'Books'}]
 });
 

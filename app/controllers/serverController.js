@@ -54,22 +54,29 @@ function findBooks (array) {
 	}
 	
 	Books
-		.find({'bookID': {$in: arr}})
+		.find({'bookId': {$in: arr}})
+		.populate('user', 'localUsername')
 		.exec(function(err, doc) {
 			if (err) throw err;
-			
-			console.log(doc + "length: " + doc.length);
 			
 			if (!doc.length) {
 				resolve(array);
 			}
-			
+
+			arr = [];
+
 			for (var j = 0, l = doc.length; j < l; j++) {
-				if (arr.indexOf(doc[j].title) !== -1) {
-					array.splice(j, 1);
-				}
+				arr[j] = doc[j].bookId;
 			}
-			
+
+			function fil(val) {
+				return arr.indexOf(val.bookId) === -1
+			}
+
+			array = array.filter(fil);
+
+
+
 			array = {ownedBooks: doc, unownedBooks: array};
 			
 			resolve(array);
@@ -89,7 +96,6 @@ function findBooks (array) {
 function server (passport) {
 	this
 		.checkTokens = function(req, res){
-			console.log(req.user);
 			var obj = (req.user).toObject();
 		if	(obj.tokens) return res.render('profile', { user: req.user });
 		req.logout();
@@ -171,15 +177,51 @@ function server (passport) {
 			});
 	};
 	
-	this.booksLogin = function(req, res) {
+	this.bookFind = function(req, res) {
 		res.render('books', {user: req.user});
-		
-		
-		
-		
-		
-		
 	};
+
+	this.createUsername = function(req, res) {
+		if (req.isAuthenticated()) {
+		return res.render('username');
+	}
+		return res.render('login');
+
+	};
+	this.checkUsername = function(req, res) {
+
+		if (!req.params.username) {
+			return res.json({'error': 'please enter a username'});
+		}
+
+		if (/\W/.test(req.params.username) || req.params.username.length > 20) {
+			return res.json({'error': 'please enter a valid username'})
+		}
+
+		User
+		.find({'localUsername' : req.params.username})
+		.then(function(doc) {
+			if (doc.length) {
+				return res.json({'error': 'that username is already taken'});
+			}
+
+			User
+			.update({'_id': req.user._id}, {'localUsername': req.params.username})
+			.exec(function(err, result) {
+					if (err) throw err;
+					return res.json({'success': 'your username is now changed'});
+
+			});
+
+
+		}).catch(function(reject){
+			console.log('error in finding username thenable, reason: ' + reject);
+		})
+
+
+	};
+
+
     
     
     this.bookSearch = function(req, res) {
@@ -211,12 +253,10 @@ function server (passport) {
     
     this.addBook = function(req, res) {
 		
-		console.log(req.query);
     	
     	User
 			.findOne({'_id': req.user._id}).exec()
 			.then(function(doc) {
-				console.log(doc);
 				if (doc.books.length >= 5) return res.json({'error': "you may not have more than 5 books at a time. Remove or trade with others!"});
 				Books
 					.findOne({'bookId': req.query.bookId})
@@ -233,7 +273,6 @@ function server (passport) {
 						book.save().then(function(bookDoc) {
 							User.update({'_id': req.user._id}, {$push: {books :bookDoc._id}})
 							.exec(function(err, userDoc) {
-								console.log(userDoc);
 								res.json({'query':'completed'});
 							});
 							
@@ -247,6 +286,18 @@ function server (passport) {
 			})
 		
     	
+    };
+    this.bookListIndex = function(req, res){
+    	Books
+    	.find({})
+    	.populate('user', 'localUsername')
+    	.exec(function(err, doc){
+    		if (err) throw err;
+    		res.json(doc);
+    	});
+
+
+
     };
     
     

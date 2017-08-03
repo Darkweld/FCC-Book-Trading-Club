@@ -8,7 +8,7 @@ var Books = new Schema({
     title: String,
     authors: Array,
     image: String,
-    user : {type: Schema.Types.ObjectId, ref: 'User' }
+    user : {type: Schema.Types.ObjectId, ref: 'User'}
 });
 
 

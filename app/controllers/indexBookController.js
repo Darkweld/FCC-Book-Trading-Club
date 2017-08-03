@@ -1,14 +1,8 @@
 'use strict';
 
-
 (function() {
-    var search = document.getElementById('bookSearch');
-    var mainContainer = document.getElementById('mainContainer');
-    var pagination = document.getElementById('pagination');
-    var ownedBooks = document.getElementById('ownedBooks');
-    var error = document.getElementById('error');
- 
-    function arrayLoop(array) {
+
+function arrayLoop(array) {
             
             var fragment = document.createDocumentFragment();
             
@@ -17,9 +11,6 @@
             var linkNum = 0;
             
         for (var i = 0, l = array.length; i < l; i++) {
-            
-            
-            
 
             var bookDiv = document.createElement('div');
             bookDiv.className = "bookDiv";
@@ -90,86 +81,28 @@
             }
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    search.addEventListener('submit', function(event) {
-        event.preventDefault();
-        xhttp.request('GET', mainUrl + '/bookSearch?q=' + document.getElementById('bookSearchBar').value, function(data) {
-            data = JSON.parse(data);
-            console.log(data);
-            if (data.error) {
-                  return error.textContent = data.error;
-            }
-            
-            error.textContent = '';
-            
-            
-            if (data.ownedBooks) {
-                
-             for (var i = 0, l = data.ownedBooks.length; i < l; i++) {
-                 
-            var bookDiv = document.createElement('div');
-            bookDiv.className = "bookDiv";
-            
-            var bookImage = document.createElement('img');
-            bookImage.src = data.ownedBooks[i].image;
-            bookImage.className = 'bookImage';
-            bookDiv.appendChild(bookImage);
-            
-            var bookTitle = document.createElement('p');
-            bookTitle.textContent = data.ownedBooks[i].title;
-            bookTitle.className = "bookTitle";
-            bookDiv.appendChild(bookTitle);
-            
-            if (data.ownedBooks[i].authors)
-            
-            for (var j = 0, k = data.ownedBooks[i].authors.length; j < k; j++) {
-                var bookAuthor = document.createElement('p');
-                bookAuthor.textContent = data.ownedBooks[i].authors[j];
-                bookAuthor.className = "bookAuthor";
-                bookDiv.appendChild(bookAuthor);
-            }
-            
-            var bookUser = document.createElement('a');
-            bookUser.textContent = data.ownedBooks[i].user.localUsername;
-            bookUser.className = "bookUser";
-            bookDiv.appendChild(bookUser);
 
-            (function(div) {
-               div.addEventListener('click', function(event) {
 
-               	//PUT HOVER EVENTLISTENER TO SHOW USERNAME?????
-                   console.log("clicky");
+ 	xhttp.ready(xhttp.request('GET', mainUrl + '/bookListIndex', function(data){
+ 		data = JSON.parse(data);
+ 		console.log(data);
 
-               }, false);
-            })(bookDiv);
-            
-            ownedBooks.appendChild(bookDiv);
-            
-            }
 
-              return arrayLoop(data.unownedBooks);
-                
-                
-            }
-            
-            
-            return arrayLoop(data);
-     
-        });
-        
-        
-        
-    }, false);
-    
+
+ 	}));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 })();

@@ -158,3 +158,10 @@ body {
     height: 300px;
     margin: 10px;
 }
+.owned-books-container {
+    background-color: green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: wrap;
+}
