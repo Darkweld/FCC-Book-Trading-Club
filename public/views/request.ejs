@@ -1,0 +1,32 @@
+<html>
+  <head>
+    
+    <link href = "/public/css/css.css" type = "text/css" rel = "stylesheet">
+    
+  </head>
+  
+  <body>
+    <div class =  "link-container">
+      <a href = "/profile">Profile</a>
+      <a href = "/logout">Logout</a>
+    </div>
+
+    <div id = "requestee" class = requestee></div>
+    <div id = 'requesteeDrag' class = "requesteeDrag"></div>
+    <div id = "requester" class = requester></div>
+    <div id = 'requesterDrag' class = "requesterDrag"></div>
+
+
+
+    <script>
+    var reciever = <%- JSON.stringify(reciever) %>
+    var requester = <%- JSON.stringify(requester) %>
+    </script>
+    
+    <script type = 'text/javascript' src = '/ajax/requests.js'></script>
+    <script type = 'text/javascript' src = '/controllers/requestController.js'></script>
+    
+    
+  </body>
+  </html>
+  

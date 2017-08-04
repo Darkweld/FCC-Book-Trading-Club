@@ -299,6 +299,19 @@ function server (passport) {
 
 
     };
+    this.requestPage = function(req, res) {
+    	//if (req.params.user === req.user.localUsername) return res.redirect('/profile');
+    	//if (!req.params.user) return res.redirect ('/');
+
+
+    	User.findOne({'localUsername': req.params.user})
+    	.exec(function(err, doc){
+    			if (err) throw err;
+    				res.render('request', {reciever : doc, requester: req.user});
+    	});
+
+
+    };
     
     
     

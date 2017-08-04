@@ -83,9 +83,7 @@ module.exports = function(app, passport) {
 });
     app.route('/bookListIndex')
         .get(server.bookListIndex);
-
-
-
+        
     app.route('/findBooks')
         .get(userLoggedIn, server.bookFind);
 
@@ -95,6 +93,8 @@ module.exports = function(app, passport) {
     app.route('/addBook')
         .post(server.addBook);
 
+    app.route(['/request', '/request/:user'])
+        .get(userLoggedIn, server.requestPage);
 
 
 };

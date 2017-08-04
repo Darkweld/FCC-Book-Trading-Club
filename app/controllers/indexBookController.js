@@ -1,6 +1,9 @@
 'use strict';
 
 (function() {
+var bookContainer = document.getElementById('bookContainer');
+
+
 
 function arrayLoop(array) {
             
@@ -33,59 +36,34 @@ function arrayLoop(array) {
                 bookAuthor.className = "bookAuthor";
                 bookDiv.appendChild(bookAuthor);
             }
-            
-            (function(div) {
-                var url = mainUrl + '/addBook?bookId=' + array[i].bookId + '&title=' + array[i].title + '&image=' + array[i].image.replace(/&/g, "%26");
-                
-                if (array[i].authors) {
-                    url += '&authors=' + array[i].authors;
-                }
-               div.addEventListener('click', function(event) {
-                   xhttp.request('POST', url, function(response) {
-                        console.log(response);
-                       
-                   });
-               }, false);
-            })(bookDiv);
-            
-            
-            count++;
-            fragment.appendChild(bookDiv);
-            
-            if (count === 10 || i === l - 1) {
-                count = 0;
-                linkNum++;
-               var paginationLink = document.createElement('a');
-               paginationLink.textContent = linkNum;
-               paginationLink.className = "paginationLink";
-               var appendMe = document.createElement('div');
-               appendMe.id = "bookContainer";
-               appendMe.className = "book-container";
-               appendMe.appendChild(fragment);
-               
-               
-               (function(link, append) {
-                   link.addEventListener('click', function(event) {
-                       event.preventDefault();
-                       if (document.getElementById('bookContainer')) {
-                           mainContainer.removeChild(document.getElementById('bookContainer'));
-                       }
-                       
-                       mainContainer.appendChild(append);
 
-                   }, false);
-                   
-               })(paginationLink, appendMe);
-               
-               pagination.appendChild(paginationLink);
-            }
+            var tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = 'owned by: ' + array[i].user.localUsername;
+            bookDiv.appendChild(tooltip);
+
+            
+            (function(div, username) {
+
+               div.addEventListener('click', function(event) {
+                   	window.location.href = mainUrl + '/request/' + username;
+               }, false);
+            })(bookDiv, array[i].user.localUsername);
+            
+
+            fragment.appendChild(bookDiv);
+
         }
+
+        bookContainer.appendChild(fragment);
+
     }
 
 
  	xhttp.ready(xhttp.request('GET', mainUrl + '/bookListIndex', function(data){
  		data = JSON.parse(data);
- 		console.log(data);
+ 		
+ 		arrayLoop(data);
 
 
 
