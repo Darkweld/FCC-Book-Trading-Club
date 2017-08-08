@@ -95,19 +95,19 @@ body {
 
 .link-container {
     text-align: center;
-    background-color: #80b3b3;
+    background-color: dimgray;
     position: fixed;
     padding: 5px;
     border-radius: 10px;
-    bottom: 0;
+    top:0px;
     left: 0;
     right: 0;
     margin: 0 auto 10px auto;
 }
 .link-container a{
-    color: white;
+    color: #80b3b3;
     display: inline-block;
-    background-color: dimgray;
+    background-color: black;
     padding: 10px;
     width: 100px;
     margin: 0 auto 0 auto;
@@ -153,34 +153,31 @@ body {
     flex-wrap: wrap;
 }
 .bookDiv {
-    background-color: white;
-    width: 200px;
     margin: 10px;
     display: flex;
-    text-align: center;
-    flex-direction: column;
+}
+.bookImage {
+    width:250px;
+    height: 250px;
 }
 .tooltip {
     visibility: hidden;
-    width: 200px;
+    width: 240px;
+    height: 240px;
     background-color: black;
-    color: #fff;
+    color: white;
     text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
+    padding: 5px;
     position: absolute;
     z-index: 1;
     margin: 0;
     display: flex;
+    flex-flow: column;
     align-items: center;
     justify-content: center;
-    top: 5px;
-
 }
 .bookdiv:hover .tooltip {
     visibility: visible;
-}
-
 }
 .owned-books-container {
     background-color: green;
@@ -188,4 +185,29 @@ body {
     align-items: center;
     justify-content: center;
     flex-flow: wrap;
+}
+.requestee, .requester, .requesteeDrag, .requesterDrag {
+    display: flex;
+    justify-content: center;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    height: 270px;
+    margin: 10px 0 10px 0;
+}
+.requesteeDrag, .requesterDrag {
+    border: 5px solid white;
+}
+.main-request-container {
+    margin: 5% auto 5% auto;
+    width: 80%;
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+.requestTitle {
+    font-size: 20px;
+    color: white;
+    text-align: center;
+    margin: 0;
 }

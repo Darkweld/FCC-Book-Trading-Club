@@ -78,9 +78,7 @@ module.exports = function(app, passport) {
         .delete(userLoggedIn, server.deleteAccount);
     
     app.route('/getUser')
-        .get(function(req, res) {
-            res.json(req.user);
-});
+        .get(server.userPage);
     app.route('/bookListIndex')
         .get(server.bookListIndex);
         
@@ -96,5 +94,7 @@ module.exports = function(app, passport) {
     app.route(['/request', '/request/:user'])
         .get(userLoggedIn, server.requestPage);
 
+    app.route('/makeRequest')
+        .post(server.makeRequest);
 
 };

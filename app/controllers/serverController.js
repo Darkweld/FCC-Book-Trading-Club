@@ -2,6 +2,7 @@
 
 var User = require('../models/user');
 var Books = require('../models/books');
+var Requests = require('../models/requests');
 var https = require('https');
 
 function apiBookRequest(val) {
@@ -296,8 +297,6 @@ function server (passport) {
     		res.json(doc);
     	});
 
-
-
     };
     this.requestPage = function(req, res) {
     	//if (req.params.user === req.user.localUsername) return res.redirect('/profile');
@@ -305,15 +304,88 @@ function server (passport) {
 
 
     	User.findOne({'localUsername': req.params.user})
-    	.exec(function(err, doc){
+    	.populate('books')
+    	.then(function(reciever){
+    	User
+    		.findOne({'_id': req.user._id})
+    		.populate('books')
+    		.exec(function(err, requester){
     			if (err) throw err;
-    				res.render('request', {reciever : doc, requester: req.user});
+    			res.render('request', {reciever: JSON.stringify(reciever), requester: JSON.stringify(requester)})
+    		})
+    	}).catch(function(reason){
+    		console.log('error in requestPage findOne, reason: ' + reason);
     	});
 
 
     };
     
-    
+    this.makeRequest = function(req, res){
+    	if (!req.query.recBooks && !req.query.reqBooks) return res.json({'error': "no books chosen. click books to add them to make a request"});
+
+    	var recLength;
+    	var reqLength;
+    	var recBooks = req.query.recBooks.split(',');
+    	var reqBooks = req.query.reqBooks.split(',');
+
+    	(recBooks[0] === "") ? recLength = 0 : recLength = recBooks.length;
+    	(reqBooks[0] === "") ? reqLength = 0 : reqLength = reqBooks.length;
+
+    	User
+    	.findOne({'_id': req.query.recID})
+    	.then(function(doc){
+    		if (doc.requests.length >= 10) return res.json({'error': "that user's request inbox is full"});
+    		if ((doc.books.length + reqLength - recLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
+
+    		User
+    			.findOne({'_id': req.query.reqID})
+    			.then(function(doc2) {
+    				if (doc2.requests.length >= 10) return res.json({'error': "you have too many pending requests. Wait or delete some pending requests."});
+    				if ((doc2.books.length + recLength - reqLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
+
+    				var request = new Requests({
+    					booksRequested: recBooks || "",
+    					from: doc2._id,
+    					booksOffered: reqBooks || "",
+    					to: doc._id
+    				});
+
+    				request.save().then(function(requestDoc){
+    					User.update({'_id': doc._id}, {$push: {requests: requestDoc._id}}).then(function(userDoc){
+    						User.update({'_id': doc2._id}, {$push: {requests: requestDoc._id}})
+    						.exec(function(err){
+    							if (err) throw err;
+    							return res.json({requestDoc});
+    						})	
+    					}).catch(function(reason){
+    		console.log('error in updating user, reason: ' + reason)
+    		});
+
+
+    				}).catch(function(reason){
+    		console.log('error in saving request/users, reason: ' + reason)
+    		});
+
+    			}).catch(function(reason){
+    		console.log('error in findOne user requester, reason: ' + reason)
+    		});
+
+    	}).catch(function(reason){
+    		console.log('error in findOne user reciever, reason: ' + reason)
+    	})
+
+    };
+	
+	this.userPage = function(req, res) {
+		User
+			.findOne(req.user._id)
+			.populate('books requests')
+			.exec(function(err, doc){
+				if (err) throw err;
+				console.log(doc);
+				res.json(doc);
+			})
+	}    
     
     
     

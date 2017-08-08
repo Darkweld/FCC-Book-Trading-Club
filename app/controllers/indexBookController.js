@@ -9,10 +9,6 @@ function arrayLoop(array) {
             
             var fragment = document.createDocumentFragment();
             
-            var count = 0;
-            
-            var linkNum = 0;
-            
         for (var i = 0, l = array.length; i < l; i++) {
 
             var bookDiv = document.createElement('div');
@@ -22,11 +18,14 @@ function arrayLoop(array) {
             bookImage.src = array[i].image;
             bookImage.className = 'bookImage';
             bookDiv.appendChild(bookImage);
+
+            var tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
             
             var bookTitle = document.createElement('p');
             bookTitle.textContent = array[i].title;
             bookTitle.className = "bookTitle";
-            bookDiv.appendChild(bookTitle);
+            tooltip.appendChild(bookTitle);
             
             if (array[i].authors)
             
@@ -34,13 +33,15 @@ function arrayLoop(array) {
                 var bookAuthor = document.createElement('p');
                 bookAuthor.textContent = array[i].authors[j];
                 bookAuthor.className = "bookAuthor";
-                bookDiv.appendChild(bookAuthor);
+                tooltip.appendChild(bookAuthor);
             }
 
-            var tooltip = document.createElement('span');
-            tooltip.className = 'tooltip';
-            tooltip.textContent = 'owned by: ' + array[i].user.localUsername;
+            var bookUser = document.createElement('p');
+            bookUser.textContent = 'owned by: ' + array[i].user.localUsername;
+            bookUser.className = "bookUser";
+            tooltip.appendChild(bookUser);
             bookDiv.appendChild(tooltip);
+
 
             
             (function(div, username) {

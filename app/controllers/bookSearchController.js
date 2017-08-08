@@ -29,10 +29,14 @@
             bookImage.className = 'bookImage';
             bookDiv.appendChild(bookImage);
             
+            var tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            bookDiv.appendChild(tooltip);
+            
             var bookTitle = document.createElement('p');
             bookTitle.textContent = array[i].title;
             bookTitle.className = "bookTitle";
-            bookDiv.appendChild(bookTitle);
+            tooltip.appendChild(bookTitle);
             
             if (array[i].authors)
             
@@ -40,8 +44,10 @@
                 var bookAuthor = document.createElement('p');
                 bookAuthor.textContent = array[i].authors[j];
                 bookAuthor.className = "bookAuthor";
-                bookDiv.appendChild(bookAuthor);
+                tooltip.appendChild(bookAuthor);
             }
+
+
             
             (function(div) {
                 var url = mainUrl + '/addBook?bookId=' + array[i].bookId + '&title=' + array[i].title + '&image=' + array[i].image.replace(/&/g, "%26");
@@ -116,6 +122,8 @@
             
             if (data.ownedBooks) {
                 
+                var fragment = new DocumentFragment();
+
              for (var i = 0, l = data.ownedBooks.length; i < l; i++) {
                  
             var bookDiv = document.createElement('div');
@@ -126,10 +134,13 @@
             bookImage.className = 'bookImage';
             bookDiv.appendChild(bookImage);
             
+            var tooltip = document.createElement('span');
+            tooltip.className = 'tooltip';
+            
             var bookTitle = document.createElement('p');
             bookTitle.textContent = data.ownedBooks[i].title;
             bookTitle.className = "bookTitle";
-            bookDiv.appendChild(bookTitle);
+            tooltip.appendChild(bookTitle);
             
             if (data.ownedBooks[i].authors)
             
@@ -137,28 +148,28 @@
                 var bookAuthor = document.createElement('p');
                 bookAuthor.textContent = data.ownedBooks[i].authors[j];
                 bookAuthor.className = "bookAuthor";
-                bookDiv.appendChild(bookAuthor);
+                tooltip.appendChild(bookAuthor);
             }
-            
-            var bookUser = document.createElement('a');
-            bookUser.textContent = data.ownedBooks[i].user.localUsername;
+
+            var bookUser = document.createElement('p');
+            bookUser.textContent = 'owned by: ' + data.ownedBooks[i].user.localUsername;
             bookUser.className = "bookUser";
-            bookDiv.appendChild(bookUser);
+            tooltip.appendChild(bookUser);
+            bookDiv.appendChild(tooltip);
 
             (function(div) {
                div.addEventListener('click', function(event) {
-
-               	//PUT HOVER EVENTLISTENER TO SHOW USERNAME?????
                    console.log("clicky");
-
+                    //TODO redirect to request page?? should be easy.
                }, false);
             })(bookDiv);
             
-            ownedBooks.appendChild(bookDiv);
+            fragment.appendChild(bookDiv);
             
             }
+            ownedBooks.appendChild(fragment);
 
-              return arrayLoop(data.unownedBooks);
+            return arrayLoop(data.unownedBooks);
                 
                 
             }

@@ -11,16 +11,15 @@
       <a href = "/logout">Logout</a>
     </div>
 
-    <div id = "requestee" class = requestee></div>
-    <div id = 'requesteeDrag' class = "requesteeDrag"></div>
-    <div id = "requester" class = requester></div>
-    <div id = 'requesterDrag' class = "requesterDrag"></div>
 
+    <div class = 'main-request-container' id = "mainRequestDiv">
+
+    </div>
 
 
     <script>
-    var reciever = <%- JSON.stringify(reciever) %>
-    var requester = <%- JSON.stringify(requester) %>
+    var reciever = <%- reciever %>
+    var requester = <%- requester %>
     </script>
     
     <script type = 'text/javascript' src = '/ajax/requests.js'></script>
