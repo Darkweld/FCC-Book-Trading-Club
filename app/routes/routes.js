@@ -79,6 +79,7 @@ module.exports = function(app, passport) {
     
     app.route('/getUser')
         .get(server.userPage);
+
     app.route('/bookListIndex')
         .get(server.bookListIndex);
         
@@ -97,4 +98,13 @@ module.exports = function(app, passport) {
     app.route('/makeRequest')
         .post(server.makeRequest);
 
+    app.route('/deleteBook/:book')
+        .post(server.deleteBook);
+
+    app.route('/myRequests')
+        .get(userLoggedIn, function(req, res){
+            res.render('myRequests');
+        });
+    app.route('/myRequestsController')
+        .get(server.myRequests);
 };

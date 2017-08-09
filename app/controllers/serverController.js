@@ -256,7 +256,7 @@ function server (passport) {
 		
     	
     	User
-			.findOne({'_id': req.user._id}).exec()
+			.findOne({'_id': req.user._id})
 			.then(function(doc) {
 				if (doc.books.length >= 5) return res.json({'error': "you may not have more than 5 books at a time. Remove or trade with others!"});
 				Books
@@ -344,9 +344,9 @@ function server (passport) {
     				if ((doc2.books.length + recLength - reqLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
 
     				var request = new Requests({
-    					booksRequested: recBooks || "",
+    					booksRequested: recBooks || [],
     					from: doc2._id,
-    					booksOffered: reqBooks || "",
+    					booksOffered: reqBooks || [],
     					to: doc._id
     				});
 
@@ -379,16 +379,44 @@ function server (passport) {
 	this.userPage = function(req, res) {
 		User
 			.findOne(req.user._id)
-			.populate('books requests')
+			.populate('books')
 			.exec(function(err, doc){
 				if (err) throw err;
-				console.log(doc);
-				res.json(doc);
+						res.json(doc)
 			})
-	}    
+	};   
+
+	this.deleteBook = function(req, res){
+		User
+		.update({'_id': req.user._id},{$pull: {'books': req.params.book}})
+		.then(function(doc){
+			Books
+				.remove({'_id': req.params.book},function (err){
+					if (err) throw err;
+					return res.send('completed');
+				});
+
+		}).catch(function(reason){
+			console.log('error removing from bookarray in deletebook, reason: ' + reason);
+		});
+	};
+
+	this.myRequests = function(req, res){
+		User
+			.findOne({'_id': req.user._id})
+			.populate('requests')
+			.populate({path: 'requests',
+				populate: {
+					path: 'from booksOffered booksRequested'
+				}
+			})
+			.exec(function(err, doc){
+				if (err) throw err;
+				return res.json(doc);
+			});
+	};
     
     
-    
-    
+
 }
 module.exports = server;

@@ -74,7 +74,7 @@ body {
 }
 .profile-container {
     width: 350px;
-    margin: 10% auto 10% auto;
+    margin: 5% auto 0px auto;
     background-color: dimgray;
     border-radius: 10px;
     padding: 5px;
@@ -89,7 +89,27 @@ body {
 .profile-heading {
     font-weight: 700;
 }
-
+.profile-book-container {
+    border: 5px solid white;
+    display: none;
+    justify-content: center;
+    flex-flow: row;
+    flex-wrap: wrap;
+    margin: 10px auto 10px auto;
+}
+.bookShowText {
+    color: white;
+    text-align: center;
+    font-size:20px;
+    width: 300px;
+    margin: 10px auto 0 auto;
+}
+.bookShow {
+    text-align: center;
+}
+.bookShow:hover .profile-book-container {
+    display: inline-flex;
+}
 
 
 
