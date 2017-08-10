@@ -107,4 +107,10 @@ module.exports = function(app, passport) {
         });
     app.route('/myRequestsController')
         .get(server.myRequests);
+
+    app.route('/deleteRequest/:request')
+        .post(server.deleteRequest)
+
+    app.route('/acceptRequest/:request')
+        .post(server.acceptRequest)
 };

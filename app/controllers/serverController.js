@@ -299,8 +299,8 @@ function server (passport) {
 
     };
     this.requestPage = function(req, res) {
-    	//if (req.params.user === req.user.localUsername) return res.redirect('/profile');
-    	//if (!req.params.user) return res.redirect ('/');
+    	if (req.params.user === req.user.localUsername) return res.redirect('/profile');
+    	if (!req.params.user) return res.redirect ('/');
 
 
     	User.findOne({'localUsername': req.params.user})
@@ -328,8 +328,8 @@ function server (passport) {
     	var recBooks = req.query.recBooks.split(',');
     	var reqBooks = req.query.reqBooks.split(',');
 
-    	(recBooks[0] === "") ? recLength = 0 : recLength = recBooks.length;
-    	(reqBooks[0] === "") ? reqLength = 0 : reqLength = reqBooks.length;
+    	if (recBooks[0] === "")  { recLength = 0; recBooks = []; } else { recLength = recBooks.length; }
+    	if (reqBooks[0] === "") { reqLength = 0; reqBooks = []; } else { reqLength = reqBooks.length; }
 
     	User
     	.findOne({'_id': req.query.recID})
@@ -344,9 +344,9 @@ function server (passport) {
     				if ((doc2.books.length + recLength - reqLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
 
     				var request = new Requests({
-    					booksRequested: recBooks || [],
+    					booksRequested: recBooks,
     					from: doc2._id,
-    					booksOffered: reqBooks || [],
+    					booksOffered: reqBooks,
     					to: doc._id
     				});
 
@@ -415,6 +415,36 @@ function server (passport) {
 				return res.json(doc);
 			});
 	};
+
+	this.deleteRequest = function(req, res){
+
+		//shouldn't use this until I populate requests.
+		User
+			.update({'_id': req.user._id}, {$pull: {'requests': req.params.request}})
+			.then(function(doc){
+					Requests
+						.remove({'_id': req.params.request}, function(err){
+							if (err) throw err;
+							return res.send('deleted');
+						});
+			}).catch(function(reason){
+				console.log('error in deleting request from user, reason: ' + reason);
+			});
+
+
+
+	};
+
+	this.acceptRequest = function(req, res){
+
+		//Requests
+			//.findOne({})
+
+//TODO Okay so what I need to do here is find the request, populate both users, check if both users have books required, then accept trade, pull from both users, delete request.
+
+
+
+	}
     
     
 

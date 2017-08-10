@@ -231,3 +231,64 @@ body {
     text-align: center;
     margin: 0;
 }
+.myRequests {
+    width: 80%;
+    margin: 5% auto 5% auto;
+}
+.myRequest-button-container {
+    display: flex;
+    max-width: 500px;
+    flex-flow:row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.requestNameButton {
+    width: 100px;
+    height:50px;
+}
+.request {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+    margin: 10px auto 10px auto;
+    justify-content: center;
+    align-items: center;
+}
+.recieverDivHolder, .requesterDivHolder {
+    text-align: center;
+}
+.requesterDiv, .recieverDiv {
+    display: inline-flex;
+    flex-flow: row;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid white;
+}
+.myRequestBookDiv {
+    margin: 10px;
+}
+.myRequestBookImage {
+    width:150px;
+    height: 150px;
+}
+.myRequestTooltip {
+    visibility: hidden;
+    width: 140px;
+    height: 140px;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    margin: 0;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+}
+.myRequestBookDiv:hover .myRequestTooltip {
+    visibility: visible;
+}
+
