@@ -3,7 +3,8 @@
 (function(){
 
 	var mainRequestDiv = document.getElementById('myRequestDiv');
-	var buttonContainer = document.getElementById('buttonContainer');
+	var recievedButtonContainer = document.getElementById('recievedButtonContainer');
+	var sentButtonContainer = document.getElementById('sentButtonContainer');
 
 	function makeBookDivs(array) {
 
@@ -54,12 +55,12 @@
 
 
 
-	function requestArray(reqArr){
+	function incomingRequestArray(reqArr){
 
 		if (!reqArr.length){
 			var norequestText = document.createElement('p');
-			norequestText.textContent = "You currently do not have any requests.";
-			return mainRequestDiv.appendChild(norequestText);
+			norequestText.textContent = "You currently do not have any incoming requests.";
+			return recievedButtonContainer.appendChild(norequestText);
 		}
 
 		var fragment = new DocumentFragment();
@@ -126,15 +127,16 @@
 
 				accept.addEventListener('click', function(event){
 					xhttp.request('POST', mainUrl + '/acceptRequest/' + id, function(data){
+						if (data.error) return alert('Error:\n' + data.error);
 
 						while (mainRequestDiv.hasChildNodes()){
 						mainRequestDiv.removeChild(mainRequestDiv.firstChild);
 					}
 
-					buttonContainer.removeChild(requestNameButton);
-					if (buttonContainer.hasChildNodes()){
-						for (var o = 0, p = buttonContainer.childNodes.length; o < p; o++) {
-							buttonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+					recievedButtonContainer.removeChild(requestNameButton);
+					if (recievedButtonContainer.hasChildNodes()){
+						for (var o = 0, p = recievedButtonContainer.childNodes.length; o < p; o++) {
+							recievedButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
 						}
 					}
 
@@ -148,15 +150,16 @@
 				decline.addEventListener('click', function(event){
 
 					xhttp.request('POST', mainUrl + '/deleteRequest/' + id, function(data){
+						if (data.error) return alert('Error:\n' + data.error);
 
 						while (mainRequestDiv.hasChildNodes()){
 						mainRequestDiv.removeChild(mainRequestDiv.firstChild);
 					}
 
-					buttonContainer.removeChild(requestNameButton);
-					if (buttonContainer.hasChildNodes()){
-						for (var o = 0, p = buttonContainer.childNodes.length; o < p; o++) {
-							buttonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+					recievedButtonContainer.removeChild(requestNameButton);
+					if (recievedButtonContainer.hasChildNodes()){
+						for (var o = 0, p = recievedButtonContainer.childNodes.length; o < p; o++) {
+							recievedButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
 						}
 					}
 
@@ -170,7 +173,103 @@
 
 			})(requestName, request, acceptButton, declineButton, reqArr[i]._id)
 
-			buttonContainer.appendChild(requestName);
+			recievedButtonContainer.appendChild(requestName);
+
+		}
+
+	}
+	function outgoingRequestArray(reqArr){
+
+		if (!reqArr.length){
+			var norequestText = document.createElement('p');
+			norequestText.textContent = "You currently do not have any pending outgoing requests.";
+			return sentButtonContainer.appendChild(norequestText);
+		}
+
+		var fragment = new DocumentFragment();
+
+		for (var i = 0, l = reqArr.length; i < l; i++){
+
+			var request = document.createElement('div');
+			request.className = "request";
+
+			var recieverDivHolder = document.createElement('div');
+			recieverDivHolder.className = 'recieverDivHolder';
+			var recieverDivHolderText = document.createElement('p');
+			recieverDivHolderText.textContent = "insert username here";
+
+			var recieverDiv = document.createElement('div');
+			recieverDiv.className = 'recieverDiv';
+			recieverDiv.appendChild(makeBookDivs(reqArr[i].booksRequested));
+
+			recieverDivHolder.appendChild(recieverDivHolderText);
+			recieverDivHolder.appendChild(recieverDiv);
+			request.appendChild(recieverDivHolder);
+
+			var acceptButtonDiv = document.createElement('div');
+			acceptButtonDiv.className = 'acceptButtonDiv';
+
+			var declineButton = document.createElement('button');
+			declineButton.className = 'declineButton';
+			declineButton.textContent = "Cancel Request"
+			acceptButtonDiv.appendChild(declineButton);
+
+			request.appendChild(acceptButtonDiv);
+
+			var requesterDivHolder = document.createElement('div');
+			requesterDivHolder.className = 'requesterDivHolder';
+			var requesterDivHolderText = document.createElement('p');
+			requesterDivHolderText.textContent = "insert username here 2";
+
+			var requesterDiv = document.createElement('div');
+			requesterDiv.className = 'requesterDiv';
+			requesterDiv.appendChild(makeBookDivs(reqArr[i].booksOffered));
+
+			requesterDivHolder.appendChild(requesterDiv);
+			requesterDivHolder.appendChild(requesterDivHolderText);
+			request.appendChild(requesterDivHolder);
+
+			var requestName = document.createElement('button');
+			requestName.textContent = "Request Number " + (i + 1);
+			requestName.className = 'requestNameButton';
+
+			(function(requestNameButton, requestDiv, decline, id) {
+
+				requestNameButton.addEventListener('click', function(event){
+					while (mainRequestDiv.hasChildNodes()){
+						mainRequestDiv.removeChild(mainRequestDiv.firstChild);
+					}
+
+					 mainRequestDiv.appendChild(requestDiv);
+				},false);
+
+				decline.addEventListener('click', function(event){
+
+					xhttp.request('POST', mainUrl + '/deleteRequest/' + id, function(data){
+						if (data.error) return alert('Error:\n' + data.error);
+
+						while (mainRequestDiv.hasChildNodes()){
+						mainRequestDiv.removeChild(mainRequestDiv.firstChild);
+					}
+
+					sentButtonContainer.removeChild(requestNameButton);
+					if (sentButtonContainer.hasChildNodes()){
+						for (var o = 0, p = sentButtonContainer.childNodes.length; o < p; o++) {
+							sentButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+						}
+					}
+
+					var text = document.createElement('p');
+					text.textContent = "request declined.";
+					return mainRequestDiv.appendChild(text);
+
+					});
+
+				},false);
+
+			})(requestName, request, declineButton, reqArr[i]._id)
+
+			sentButtonContainer.appendChild(requestName);
 
 		}
 
@@ -182,8 +281,8 @@
 
 xhttp.request('GET', mainUrl + '/myRequestsController', function(data){
 	data = JSON.parse(data);
-	console.log(data);
-	requestArray(data.requests);
+	incomingRequestArray(data.requestsRecieved);
+	outgoingRequestArray(data.requestsSent);
 })
 
 

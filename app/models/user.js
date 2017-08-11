@@ -30,7 +30,8 @@ var User = new Schema({
    },
    localUsername: String,
    books: [{type: Schema.Types.ObjectId, ref: 'Books'}],
-   requests : [{type: Schema.Types.ObjectId, ref: 'Requests'}]
+   requestsRecieved : [{type: Schema.Types.ObjectId, ref: 'Requests'}],
+   requestsSent : [{type: Schema.Types.ObjectId, ref: 'Requests'}]
 });
 
 

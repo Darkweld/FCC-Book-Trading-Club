@@ -303,11 +303,11 @@ function server (passport) {
     	if (!req.params.user) return res.redirect ('/');
 
 
-    	User.findOne({'localUsername': req.params.user})
+    	User.findOne({'localUsername': req.params.user}, {'localUsername': 1, 'books': 1})
     	.populate('books')
     	.then(function(reciever){
     	User
-    		.findOne({'_id': req.user._id})
+    		.findOne({'_id': req.user._id}, {'localUsername': 1, 'books': 1})
     		.populate('books')
     		.exec(function(err, requester){
     			if (err) throw err;
@@ -334,13 +334,13 @@ function server (passport) {
     	User
     	.findOne({'_id': req.query.recID})
     	.then(function(doc){
-    		if (doc.requests.length >= 10) return res.json({'error': "that user's request inbox is full"});
+    		if (doc.requestsRecieved.length >= 10) return res.json({'error': "that user's request inbox is full"});
     		if ((doc.books.length + reqLength - recLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
 
     		User
     			.findOne({'_id': req.query.reqID})
     			.then(function(doc2) {
-    				if (doc2.requests.length >= 10) return res.json({'error': "you have too many pending requests. Wait or delete some pending requests."});
+    				if (doc2.requestsSent.length >= 10) return res.json({'error': "you have too many pending requests. Wait or delete some pending requests."});
     				if ((doc2.books.length + recLength - reqLength) > 5) return res.json({'error': "a user may not have more than 5 books at a time"});
 
     				var request = new Requests({
@@ -351,8 +351,8 @@ function server (passport) {
     				});
 
     				request.save().then(function(requestDoc){
-    					User.update({'_id': doc._id}, {$push: {requests: requestDoc._id}}).then(function(userDoc){
-    						User.update({'_id': doc2._id}, {$push: {requests: requestDoc._id}})
+    					User.update({'_id': doc._id}, {$push: {requestsRecieved: requestDoc._id}}).then(function(userDoc){
+    						User.update({'_id': doc2._id}, {$push: {requestsSent: requestDoc._id}})
     						.exec(function(err){
     							if (err) throw err;
     							return res.json({requestDoc});
@@ -403,12 +403,29 @@ function server (passport) {
 
 	this.myRequests = function(req, res){
 		User
-			.findOne({'_id': req.user._id})
+			.findOne({'_id': req.user._id}, {'localUsername': 1, 'books': 1, 'requestsSent': 1, 'requestsRecieved': 1})
 			.populate('requests')
-			.populate({path: 'requests',
-				populate: {
-					path: 'from booksOffered booksRequested'
-				}
+			.populate({path: 'requestsRecieved',
+				populate: [{
+					path: 'from', select: 'localUsername'
+				},
+				{
+					path: 'booksOffered'
+				},
+				{
+					path: 'booksRequested'
+				}]
+			})
+			.populate({path: 'requestsSent',
+				populate: [{
+					path: 'to', select: 'localUsername'
+				},
+				{
+					path: 'booksOffered'
+				},
+				{
+					path: 'booksRequested'
+				}]
 			})
 			.exec(function(err, doc){
 				if (err) throw err;
@@ -418,33 +435,107 @@ function server (passport) {
 
 	this.deleteRequest = function(req, res){
 
-		//shouldn't use this until I populate requests.
-		User
-			.update({'_id': req.user._id}, {$pull: {'requests': req.params.request}})
+		Requests
+			.findOne({'_id': req.params.request})
+			.populate('from')
 			.then(function(doc){
-					Requests
-						.remove({'_id': req.params.request}, function(err){
-							if (err) throw err;
-							return res.send('deleted');
-						});
+				if (req.user._id.toString() !== doc.to.toString() && req.user._id.toString() !== doc.from._id.toString()) return res.json({error: 'invalid user'});
+				User
+					.update({'_id': doc.to}, {$pull: {'requestsRecieved': req.params.request}})
+					.then(function(userUpdate){
+						User
+							.update({'_id': doc.from._id}, {$pull: {'requestsSent': req.params.request}})
+							.then(function(userUpdate2){
+								Requests
+									.remove({'id_': req.params.request}, function(err){
+									if (err) throw err;
+									return res.send('completed');
+							});
+							}).catch(function(reason){
+						console.log('error in  user update, reason: ' + reason);
+					});
+					}).catch(function(reason){
+						console.log('error in  user update, reason: ' + reason);
+					});
 			}).catch(function(reason){
-				console.log('error in deleting request from user, reason: ' + reason);
+				console.log('error in request.findOne, reason: ' + reason);
 			});
-
-
 
 	};
 
 	this.acceptRequest = function(req, res){
 
-		//Requests
-			//.findOne({})
+		Requests
+			.findOne({'_id': req.params.request})
+			.populate('from')
+			.then(function(doc){
+				if (req.user._id.toString() !== doc.to.toString()) return res.json({error: 'invalid user'});
+					var l = doc.booksRequested.length;
+					var k = doc.booksOffered.length;
 
-//TODO Okay so what I need to do here is find the request, populate both users, check if both users have books required, then accept trade, pull from both users, delete request.
+				if ((req.user.books.length + k - l) > 5 || (doc.from.books.length + l - k) > 5) return res.json({error: 'a user may not have more than 5 books at a time'})
+
+				for (var i = 0; i < l; i++){
+					if (req.user.books.indexOf(doc.booksRequested[i]) === -1) {
+						return res.json({error: 'You no longer have some of the books in this request.'});
+						break;
+					}
+				}
+				for (var j = 0; j < k; j++){
+					if (doc.from.books.indexOf(doc.booksOffered[j]) === -1) {
+						return res.json({error: 'Requester no longer has some of the books in this request'});
+						break;
+					}
+				}
 
 
+		Books
+			.update({'_id': {$in: doc.booksOffered}}, {$set: {'user': doc.to}}, {multi: true})
+			.then(function(){
+			Books
+				.update({'_id': {$in: doc.booksRequested}}, {$set: {'user': doc.from._id}}, {multi: true})
+				.then(function(){
+				User
+					.update({'_id': doc.to}, {$push: {'books': {$each: doc.booksOffered}}})
+					.then(function(){
+				User
+					.update({'_id': doc.to}, {$pull: {'requestsRecieved': req.params.request, 'books': {$in: doc.booksRequested}}})
+					.then(function(){
+						User
+							.update({'_id': doc.from._id}, {$push: {'books': {$each: doc.booksRequested}}})
+							.then(function(){
+						User
+							.update({'_id': doc.from._id}, {$pull: {'requestsRecieved': req.params.request, 'books': {$in: doc.booksOffered}}})
+							.then(function(){
+								Requests
+									.remove({'id_': req.params.request}, function(err){
+									if (err) throw err;
+									return res.send('completed');
+							});
+							}).catch(function(reason){
+						console.log('error in  user update push 2, reason: ' + reason);
+							});
+							}).catch(function(reason){
+						console.log('error in  user update 2, reason: ' + reason);
+					});
+					}).catch(function(reason){
+						console.log('error in  user update push, reason: ' + reason);
+					});
+					}).catch(function(reason){
+						console.log('error in  user update, reason: ' + reason);
+					});
+			}).catch(function(reason){
+				console.log('error in book update2, reason: ' + reason);
+			});
+		}).catch(function(reason){
+				console.log('error in book update1, reason: ' + reason);
+			});
+	}).catch(function(reason){
+				console.log('error in request.findOne, reason: ' + reason);
+			});
 
-	}
+
+	};
     
     
 
