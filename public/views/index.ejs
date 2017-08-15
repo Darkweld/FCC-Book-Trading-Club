@@ -10,13 +10,17 @@
     <div class =  "link-container">
     <% if (user) { %>
       <a href = "/profile">Profile</a>
+      <a href = "/findbooks">Find Books</a>
+      <a href = "/myRequests">Requests<% if (user.requestsRecieved.length) { %> <span class = "requestNotification"><%=user.requestsRecieved.length%></span><% } %></a>
       <a href = "/logout">Logout</a>
     <% } else { %>
       <a href = "/login">Login</a>
     <% } %>
     </div>
 
+    <h1 class = "title">FreeCodeCamp Book Club<br> By <a class = 'userLink' href ='https://github.com/Darkweld'>Darkweld</a></h1>
     <div class = 'index-book-container'>
+    <p class = "boldText">Click a book to request a book from a user.</p>
     <div class = 'book-container' id = 'bookContainer'>
     </div>
     </div>

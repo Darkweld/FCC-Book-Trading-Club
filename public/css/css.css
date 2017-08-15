@@ -106,6 +106,7 @@ body {
 }
 .bookShow {
     text-align: center;
+    display: inline-block;
 }
 .bookShow:hover .profile-book-container {
     display: inline-flex;
@@ -140,33 +141,37 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: dimgray;
+    margin: 5% auto 0 auto;
 }
-.search {
+.search, .usernameValue {
     width: 300px;
-    height: 30px;
-    border: 3px solid white;
+    height: 50px;
+    padding: 5px;
+    border: 5px solid #80b3b3;
+    margin: 10px 0 10px 0;
+    border-radius: 15px
 }
 .searchLogo {
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     float: right;
-    border: 3px solid white;
+    border: 5px solid #80b3b3;
+    border-radius: 15px;
     box-sizing: border-box;
+    margin: 10px 0 10px 10px;
+}
+.searchForm {
+    margin: 0;
 }
 .search-error-container {
     margin: 5% auto 0 auto;
 }
-.error {
-    color: red;
-    margin: 10px 0 10px 0;
-}
 .main-book-container {
     width: 80%;
     margin: 10px auto 0 auto;
+    text-align: center;
 }
-.book-container {
-    background-color: #80b3b3;
+.book-container, .owned-books-container {
     border-radius: 50px;
     border: 5px solid black;
     display: flex;
@@ -174,20 +179,28 @@ body {
     flex-flow: row;
     flex-wrap: wrap;
 }
-.bookDiv {
+.book-container {
+    background-color: #80b3b3;;
+}
+.owned-books-container {
+    background-color: #70db70;
+}
+.bookDiv, .notOwnedBookDiv {
     margin: 10px;
     display: flex;
     border: 5px solid black;
 }
-.bookImage {
+.bookImage, .notOwnedBookImage{
     width:250px;
     height: 250px;
 }
-.tooltip {
+.notOwnedBookImage {
+    opacity: .5;
+}
+.tooltip, .notOwnedToolTip{
     visibility: hidden;
     width: 240px;
     height: 240px;
-    background-color: black;
     color: white;
     text-align: center;
     padding: 5px;
@@ -199,30 +212,61 @@ body {
     align-items: center;
     justify-content: center;
 }
+.tooltip {
+    background-color: black;
+}
+.notOwnedToolTip {
+    background-color: red;
+}
 .bookdiv:hover .tooltip {
     visibility: visible;
 }
-.owned-books-container {
-    background-color: green;
+.notOwnedBookDiv:hover .notOwnedToolTip {
+    visibility: visible;
+}
+.pagination {
+    display: inline-flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto 10px auto;
+    background-color: dimgray;
+}
+.paginationLink {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    border: 5px solid black;
+    margin: 10px;
+    text-align: center;
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-flow: wrap;
+    background-color: #80b3b3;
+}
+.paginationLinkCurrent {
+    color: red;
+    background-color: white;
 }
 .requestee, .requester, .requesteeDrag, .requesterDrag {
     display: flex;
     justify-content: center;
     flex-flow: row;
     flex-wrap: nowrap;
-    height: 270px;
-    margin: 10px 0 10px 0;
 }
 .requesteeDrag, .requesterDrag {
     border: 5px solid white;
+    min-height: 250px;
+    border-radius: 25px;
+}
+.requestPageDiv {
+    margin: 5% auto 5% auto;
+    width: 90%;
+    text-align: center;
 }
 .main-request-container {
-    margin: 5% auto 5% auto;
-    width: 80%;
     display: flex;
     flex-flow: column;
     flex-wrap: nowrap;
@@ -239,16 +283,23 @@ body {
     margin: 5% auto 5% auto;
 }
 .myRequest-button-container {
-    display: flex;
-    max-width: 500px;
+    display: inline-flex;
+    max-width: 560px;
     flex-flow:row;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    margin: 10px 0 10px 0;
+    border: 5px solid black;
+    padding: 5px;
+    background-color: #80b3b3;
 }
 .requestNameButton {
     width: 100px;
-    height:50px;
+    height: 50px;
+    padding: 10px;
+    white-space: nowrap;
+    margin: 5px;
 }
 .request {
     display: flex;
@@ -258,7 +309,7 @@ body {
     justify-content: center;
     align-items: center;
 }
-.recieverDivHolder, .requesterDivHolder {
+.recieverDivHolder, .requesterDivHolder, .bookShowHolder {
     text-align: center;
 }
 .requesterDiv, .recieverDiv {
@@ -266,36 +317,75 @@ body {
     flex-flow: row;
     justify-content: center;
     align-items: center;
-    border: 3px solid white;
+    border: 5px solid #80b3b3;
 }
-.myRequestBookDiv {
-    margin: 10px;
-}
-.myRequestBookImage {
-    width:150px;
-    height: 150px;
-}
-.myRequestTooltip {
-    visibility: hidden;
-    width: 140px;
-    height: 140px;
-    background-color: black;
+.title {
     color: white;
+    margin: 5% 0 0 0;
     text-align: center;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    margin: 0;
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
-}
-.myRequestBookDiv:hover .myRequestTooltip {
-    visibility: visible;
 }
 .index-book-container {
-    margin: 5% auto 5% auto;
+    margin: 10px auto 5% auto;
     width: 80%;
+    text-align: center;
 }
-
+.myRequestsBigText {
+    color: white;
+    font-size: 30px;
+    margin: 10px 0 10px 0;
+    font-weight: 600;
+}
+.acceptButton, .declineButton, .requestSubmit {
+    color: white;
+    padding: 15px;
+    border-radius: 15px;
+    border: 5px solid black;
+    margin: 10px;
+}
+.declineButton {
+    background-color: red;
+}
+.acceptButton, .requestSubmit{
+    background-color: green;
+}
+.requestSubmit {
+    font-size: 20px;
+}
+.requestForm {
+    margin: 0 auto 0 auto;
+}
+.textCenter {
+    text-align: center;
+}
+.boldText, .boldTextColor{
+    font-weight: 700;
+    font-size:20px;
+}
+.boldTextColor {
+    color: white;
+}
+.requestTextHeader {
+    font-size: 24px;
+    color: white;
+    margin: 0;
+}
+.status {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 600;
+}
+.userLink, .userLink:visited {
+    color: black;
+}
+.localUsernameProfile {
+    text-align: center;
+}
+.username-container {
+    margin: 10% auto 10% auto;
+    width: 80%;
+    text-align: center;
+}
+.requestNotification {
+    color: red;
+    font-weight: 700;
+}

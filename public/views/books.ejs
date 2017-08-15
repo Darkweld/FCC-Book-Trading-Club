@@ -8,27 +8,21 @@
   
   <body>
     <div class =  "link-container">
-    <% if (user) { %>
+      <a href = "/">Home</a>
       <a href = "/profile">Profile</a>
+      <a href = "/myRequests">Requests<% if (user.requestsRecieved.length) { %> <span class = "requestNotification"><%=user.requestsRecieved.length%></span><% } %></a>
       <a href = "/logout">Logout</a>
-    <% } else { %>
-      <a href = "/login">Login</a>
-    <% } %>
     </div>
     
-    <div class = "search-error-container" id = "search-error-container">
-      <p id = "error" class = "error"></p>
     <div class = "search-container" id = "search-container">
-        <form id = "bookSearch" action = "">
+        <form id = "bookSearch" class = "searchForm" action = "">
             <input type = "text" class = "search" id = "bookSearchBar" placeholder = "Input book title">
             <input type = "image" class = "searchLogo" src = '/public/images/magnifier.png'>
         </form>
     </div>
-    </div>
     
     <div class = 'main-book-container' id = 'mainContainer'>
-          <div id = 'ownedBooks' class = "owned-books-container"></div>
-          <div id = 'pagination' class = 'pagination'></div>
+
     </div>
     
     

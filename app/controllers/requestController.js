@@ -28,11 +28,9 @@ function createRequestDiv(array, username){
             bookTitle.className = "bookTitle";
             tooltip.appendChild(bookTitle);
             
-            if (array[i].authors)
-            
-            for (var j = 0, k = array[i].authors.length; j < k; j++) {
+            if (array[i].authors) {
                 var bookAuthor = document.createElement('p');
-                bookAuthor.textContent = array[i].authors[j];
+                bookAuthor.textContent = array[i].authors[0];
                 bookAuthor.className = "bookAuthor";
                 tooltip.appendChild(bookAuthor);
             }
@@ -49,6 +47,12 @@ function createRequestDiv(array, username){
         return fragment;
 
 
+    }
+
+    function resetAfterRequestSuccess(containerElement, div) {
+    	while (containerElement.hasChildNodes()) {
+    		div.appendChild(containerElement.lastChild);
+    	}
     }
 
 
@@ -77,9 +81,11 @@ function createRequestDiv(array, username){
 	var form = document.createElement('form');
 	form.action = '';
 	form.id = 'Form';
+	form.className = 'requestForm';
 	var inputButton = document.createElement('input');
 	inputButton.type = "submit";
-	inputButton.value = "submit trade!";
+	inputButton.value = "Submit trade!";
+	inputButton.className = "requestSubmit";
 	form.appendChild(inputButton);
 	fragment.appendChild(form);
 
@@ -138,13 +144,15 @@ function createRequestDiv(array, username){
 			return arr;
 		};
 
-
-
 		var url = mainUrl + '/makeRequest?' + 'recID=' + reciever._id + '&recBooks=' + childnodes(recieverDragDiv.childNodes)
 			+ '&reqID=' + requester._id + '&reqBooks=' + childnodes(requesterDragDiv.childNodes);
 
 		xhttp.request('POST', url, function(data){
-			console.log(data);
+			data = JSON.parse(data);
+			if (data.error) return alert(data.error);
+			resetAfterRequestSuccess(recieverDragDiv, recieverDiv);
+			return resetAfterRequestSuccess(requesterDragDiv, requesterDiv);
+
 		})
 
 	}, false);

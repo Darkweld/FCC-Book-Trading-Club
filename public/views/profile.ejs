@@ -50,16 +50,29 @@
             <a id ="facebook" href = "/auth/facebook"><img src = "/public/images/facebook.png" class = "logo"></a>
         </div>
     </div>
+    <div class = "profile localUsernameProfile">
+    <%if (user.localUsername) { %>
+        <p><span class = "profile-heading">Your book-club username: </span> <%= user.localUsername %></p>
+        <a class = 'userLink' href = '/username'>Change username?</a>
+        <% } else { %>
+        <p><span class = "profile-heading">You have not chosen a book-club username.</span> Visit <a class = 'userLink' href = '/username'>the username page</a> to change it</p>
+        <% } %>
+    </div>
     
     </div>
+
+    <div class = "bookShowHolder">
     <div class = 'bookShow'>
-    <p class = 'bookShowText' id = 'bookShowText'>Hover to view your books</p>
-    <div class = 'profile-book-container' id = 'profileBookContainer'>
+    <p class = 'bookShowText' id = 'bookShowText'>Hover to view your books. <br>Click a book to delete it.</p>
+    <div class = 'profile-book-container' id = 'profileBookContainer'></div>
     </div>
     </div>
     
     <div class =  "link-container">
       <a href = "/">Home</a>
+      <a href = "/profile">Profile</a>
+      <a href = "/findbooks">Find Books</a>
+      <a href = "/myRequests">Requests<% if (user.requestsRecieved.length) { %> <span class = "requestNotification"><%=user.requestsRecieved.length%></span><% } %></a>
       <a href = "/logout">Logout</a>
     </div>
         

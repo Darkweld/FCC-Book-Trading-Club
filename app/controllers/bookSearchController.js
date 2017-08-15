@@ -4,9 +4,6 @@
 (function() {
     var search = document.getElementById('bookSearch');
     var mainContainer = document.getElementById('mainContainer');
-    var pagination = document.getElementById('pagination');
-    var ownedBooks = document.getElementById('ownedBooks');
-    var error = document.getElementById('error');
  
     function arrayLoop(array) {
             
@@ -16,10 +13,10 @@
             
             var linkNum = 0;
             
+            var pagination = document.createElement('div');
+            pagination.className = "pagination";
+
         for (var i = 0, l = array.length; i < l; i++) {
-            
-            
-            
 
             var bookDiv = document.createElement('div');
             bookDiv.className = "bookDiv";
@@ -46,8 +43,6 @@
                 bookAuthor.className = "bookAuthor";
                 tooltip.appendChild(bookAuthor);
             }
-
-
             
             (function(div) {
                 var url = mainUrl + '/addBook?bookId=' + array[i].bookId + '&title=' + array[i].title + '&image=' + array[i].image.replace(/&/g, "%26");
@@ -82,6 +77,11 @@
                (function(link, append) {
                    link.addEventListener('click', function(event) {
                        event.preventDefault();
+                       var children = pagination.childNodes;
+                       for (var x = 0, y = children.length; x < y; x++) {
+                        children[x].classList.remove('paginationLinkCurrent');
+                       }
+                       link.classList.add('paginationLinkCurrent');
                        if (document.getElementById('bookContainer')) {
                            mainContainer.removeChild(document.getElementById('bookContainer'));
                        }
@@ -95,34 +95,27 @@
                pagination.appendChild(paginationLink);
             }
         }
+        mainContainer.appendChild(pagination);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     search.addEventListener('submit', function(event) {
         event.preventDefault();
         xhttp.request('GET', mainUrl + '/bookSearch?q=' + document.getElementById('bookSearchBar').value, function(data) {
             data = JSON.parse(data);
-            console.log(data);
             if (data.error) {
-                  return error.textContent = data.error;
+                  return alert(data.error);
             }
-            
-            error.textContent = '';
-            
+            while(mainContainer.hasChildNodes()){
+              mainContainer.removeChild(mainContainer.lastChild);
+            }
             
             if (data.ownedBooks) {
                 
                 var fragment = new DocumentFragment();
+
+                var ownedBooks = document.createElement('div');
+                ownedBooks.className = 'owned-books-container'; 
+
 
              for (var i = 0, l = data.ownedBooks.length; i < l; i++) {
                  
@@ -157,17 +150,17 @@
             tooltip.appendChild(bookUser);
             bookDiv.appendChild(tooltip);
 
-            (function(div) {
+            (function(div, username) {
                div.addEventListener('click', function(event) {
-                   console.log("clicky");
-                    //TODO redirect to request page?? should be easy.
+                   window.location.href = mainUrl + '/request/' + username;
                }, false);
-            })(bookDiv);
+            })(bookDiv, data.ownedBooks[i].user.localUsername);
             
             fragment.appendChild(bookDiv);
             
             }
             ownedBooks.appendChild(fragment);
+            mainContainer.appendChild(ownedBooks);
 
             return arrayLoop(data.unownedBooks);
                 

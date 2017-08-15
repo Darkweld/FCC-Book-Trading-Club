@@ -6,7 +6,7 @@
 	var recievedButtonContainer = document.getElementById('recievedButtonContainer');
 	var sentButtonContainer = document.getElementById('sentButtonContainer');
 
-	function makeBookDivs(array) {
+	function makeBookDivs(array, userBookArray) {
 
 		if (!array.length) {
         	var nothingText = document.createElement('p');
@@ -20,28 +20,37 @@
         for (var i = 0, l = array.length; i < l; i++) {
 
             var bookDiv = document.createElement('div');
-            bookDiv.className = "myRequestBookDiv";
+            bookDiv.className = "bookDiv";
             
+
             var bookImage = document.createElement('img');
             bookImage.src = array[i].image;
-            bookImage.className = 'myRequestBookImage';
+            bookImage.className = 'bookImage';
             bookDiv.appendChild(bookImage);
 
             var tooltip = document.createElement('span');
-            tooltip.className = 'myRequestTooltip';
+            tooltip.className = 'tooltip';
             
             var bookTitle = document.createElement('p');
             bookTitle.textContent = array[i].title;
             bookTitle.className = "bookTitle";
             tooltip.appendChild(bookTitle);
             
-            if (array[i].authors)
-            
-            for (var j = 0, k = array[i].authors.length; j < k; j++) {
+            if (array[i].authors) {
                 var bookAuthor = document.createElement('p');
-                bookAuthor.textContent = array[i].authors[j];
+                bookAuthor.textContent = array[i].authors[0];
                 bookAuthor.className = "bookAuthor";
                 tooltip.appendChild(bookAuthor);
+            }
+
+            if (userBookArray.indexOf(array[i]._id) === -1) {
+            	bookDiv.className = 'notOwnedBookDiv';
+            	bookImage.className = 'notOwnedBookImage';
+            	tooltip.className = 'notOwnedToolTip';
+            	var boldText = document.createElement('p');
+            	boldText.textContent = 'User no longer owns book.'
+            	boldText.className = "boldText";
+            	tooltip.appendChild(boldText);
             }
 
             bookDiv.appendChild(tooltip);
@@ -55,15 +64,15 @@
 
 
 
-	function incomingRequestArray(reqArr){
+	function incomingRequestArray(reqArr, books){
 
+		
 		if (!reqArr.length){
-			var norequestText = document.createElement('p');
-			norequestText.textContent = "You currently do not have any incoming requests.";
-			return recievedButtonContainer.appendChild(norequestText);
+			var requestText = document.createElement('p');
+			requestText.textContent = "You currently do not have any incoming requests.";
+			return recievedButtonContainer.appendChild(requestText);
 		}
 
-		var fragment = new DocumentFragment();
 
 		for (var i = 0, l = reqArr.length; i < l; i++){
 
@@ -72,16 +81,43 @@
 
 			var recieverDivHolder = document.createElement('div');
 			recieverDivHolder.className = 'recieverDivHolder';
+
+
+			var userLink = document.createElement('a');
+			userLink.href = mainUrl + '/request/' + reqArr[i].from.localUsername;
+			userLink.className = 'userLink';
+			userLink.textContent = reqArr[i].from.localUsername;
 			var recieverDivHolderText = document.createElement('p');
-			recieverDivHolderText.textContent = "insert username here";
+			recieverDivHolderText.className = 'myRequestsBigText';
+			recieverDivHolderText.appendChild(userLink);
+			recieverDivHolderText.innerHTML += " offered these books:";
 
 			var recieverDiv = document.createElement('div');
 			recieverDiv.className = 'recieverDiv';
-			recieverDiv.appendChild(makeBookDivs(reqArr[i].booksRequested));
+			recieverDiv.appendChild(makeBookDivs(reqArr[i].booksRequested, books));
 
 			recieverDivHolder.appendChild(recieverDivHolderText);
 			recieverDivHolder.appendChild(recieverDiv);
 			request.appendChild(recieverDivHolder);
+
+			var middleText = document.createElement('p');
+			middleText.textContent = "For these books:";
+			middleText.className = 'myRequestsBigText';
+			request.appendChild(middleText);
+
+			var requesterDivHolder = document.createElement('div');
+			requesterDivHolder.className = 'requesterDivHolder';			
+
+			var requesterDiv = document.createElement('div');
+			requesterDiv.className = 'requesterDiv';
+			requesterDiv.appendChild(makeBookDivs(reqArr[i].booksOffered, reqArr[i].from.books));
+
+			requesterDivHolder.appendChild(requesterDiv);
+			request.appendChild(requesterDivHolder);
+
+			var requestName = document.createElement('button');
+			requestName.textContent = "Request " + (i + 1);
+			requestName.className = 'requestNameButton';
 
 			var acceptButtonDiv = document.createElement('div');
 			acceptButtonDiv.className = 'acceptButtonDiv';
@@ -97,23 +133,6 @@
 			acceptButtonDiv.appendChild(declineButton);
 
 			request.appendChild(acceptButtonDiv);
-
-			var requesterDivHolder = document.createElement('div');
-			requesterDivHolder.className = 'requesterDivHolder';
-			var requesterDivHolderText = document.createElement('p');
-			requesterDivHolderText.textContent = "insert username here 2";
-
-			var requesterDiv = document.createElement('div');
-			requesterDiv.className = 'requesterDiv';
-			requesterDiv.appendChild(makeBookDivs(reqArr[i].booksOffered));
-
-			requesterDivHolder.appendChild(requesterDiv);
-			requesterDivHolder.appendChild(requesterDivHolderText);
-			request.appendChild(requesterDivHolder);
-
-			var requestName = document.createElement('button');
-			requestName.textContent = "Request Number " + (i + 1);
-			requestName.className = 'requestNameButton';
 
 			(function(requestNameButton, requestDiv, accept, decline, id) {
 
@@ -136,12 +155,13 @@
 					recievedButtonContainer.removeChild(requestNameButton);
 					if (recievedButtonContainer.hasChildNodes()){
 						for (var o = 0, p = recievedButtonContainer.childNodes.length; o < p; o++) {
-							recievedButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+							recievedButtonContainer.childNodes[o].textContent = "Request " + (o + 1);
 						}
 					}
 
 					var text = document.createElement('p');
-					text.textContent = "request accepted.";
+					text.textContent = "Request accepted.";
+					text.className = 'status';
 					return mainRequestDiv.appendChild(text);
 
 					});
@@ -159,12 +179,13 @@
 					recievedButtonContainer.removeChild(requestNameButton);
 					if (recievedButtonContainer.hasChildNodes()){
 						for (var o = 0, p = recievedButtonContainer.childNodes.length; o < p; o++) {
-							recievedButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+							recievedButtonContainer.childNodes[o].textContent = "Request " + (o + 1);
 						}
 					}
 
 					var text = document.createElement('p');
-					text.textContent = "request declined.";
+					text.textContent = "Request declined.";
+					text.className = 'status';
 					return mainRequestDiv.appendChild(text);
 
 					});
@@ -178,15 +199,14 @@
 		}
 
 	}
-	function outgoingRequestArray(reqArr){
+	function outgoingRequestArray(reqArr, books){
+
 
 		if (!reqArr.length){
-			var norequestText = document.createElement('p');
-			norequestText.textContent = "You currently do not have any pending outgoing requests.";
-			return sentButtonContainer.appendChild(norequestText);
+			var requestText = document.createElement('p');
+			requestText.textContent = "You currently do not have any pending outgoing requests.";
+			return sentButtonContainer.appendChild(requestText);
 		}
-
-		var fragment = new DocumentFragment();
 
 		for (var i = 0, l = reqArr.length; i < l; i++){
 
@@ -195,42 +215,57 @@
 
 			var recieverDivHolder = document.createElement('div');
 			recieverDivHolder.className = 'recieverDivHolder';
+
 			var recieverDivHolderText = document.createElement('p');
-			recieverDivHolderText.textContent = "insert username here";
+			recieverDivHolderText.textContent = "You offered these books:";
+			recieverDivHolderText.className = 'myRequestsBigText';
 
 			var recieverDiv = document.createElement('div');
 			recieverDiv.className = 'recieverDiv';
-			recieverDiv.appendChild(makeBookDivs(reqArr[i].booksRequested));
+			recieverDiv.appendChild(makeBookDivs(reqArr[i].booksOffered, books));
 
 			recieverDivHolder.appendChild(recieverDivHolderText);
 			recieverDivHolder.appendChild(recieverDiv);
 			request.appendChild(recieverDivHolder);
+
+			var middleText = document.createElement('p');
+			middleText.textContent = "For these books:";
+			middleText.className = 'myRequestsBigText';
+			request.appendChild(middleText);
+
+			var requesterDivHolder = document.createElement('div');
+			requesterDivHolder.className = 'requesterDivHolder';
+
+			var requesterDivHolderText = document.createElement('p');
+			requesterDivHolderText.textContent = "From the user: "
+			requesterDivHolderText.className = 'myRequestsBigText';
+			var userLink = document.createElement('a');
+			userLink.href = mainUrl + '/request/' + reqArr[i].to.localUsername;
+			userLink.className = 'userLink';
+			userLink.textContent = reqArr[i].to.localUsername;
+			requesterDivHolderText.appendChild(userLink);
+
+
+			var requesterDiv = document.createElement('div');
+			requesterDiv.className = 'requesterDiv';
+			requesterDiv.appendChild(makeBookDivs(reqArr[i].booksRequested, reqArr[i].to.books));
+
+			requesterDivHolder.appendChild(requesterDiv);
+			requesterDivHolder.appendChild(requesterDivHolderText);
+			request.appendChild(requesterDivHolder);
 
 			var acceptButtonDiv = document.createElement('div');
 			acceptButtonDiv.className = 'acceptButtonDiv';
 
 			var declineButton = document.createElement('button');
 			declineButton.className = 'declineButton';
-			declineButton.textContent = "Cancel Request"
+			declineButton.textContent = "Cancel Request";
 			acceptButtonDiv.appendChild(declineButton);
 
 			request.appendChild(acceptButtonDiv);
 
-			var requesterDivHolder = document.createElement('div');
-			requesterDivHolder.className = 'requesterDivHolder';
-			var requesterDivHolderText = document.createElement('p');
-			requesterDivHolderText.textContent = "insert username here 2";
-
-			var requesterDiv = document.createElement('div');
-			requesterDiv.className = 'requesterDiv';
-			requesterDiv.appendChild(makeBookDivs(reqArr[i].booksOffered));
-
-			requesterDivHolder.appendChild(requesterDiv);
-			requesterDivHolder.appendChild(requesterDivHolderText);
-			request.appendChild(requesterDivHolder);
-
 			var requestName = document.createElement('button');
-			requestName.textContent = "Request Number " + (i + 1);
+			requestName.textContent = "Request " + (i + 1);
 			requestName.className = 'requestNameButton';
 
 			(function(requestNameButton, requestDiv, decline, id) {
@@ -255,12 +290,13 @@
 					sentButtonContainer.removeChild(requestNameButton);
 					if (sentButtonContainer.hasChildNodes()){
 						for (var o = 0, p = sentButtonContainer.childNodes.length; o < p; o++) {
-							sentButtonContainer.childNodes[o].textContent = "Request Number " + (o + 1);
+							sentButtonContainer.childNodes[o].textContent = "Request " + (o + 1);
 						}
 					}
 
 					var text = document.createElement('p');
-					text.textContent = "request declined.";
+					text.textContent = "Request declined.";
+					text.className = 'status';
 					return mainRequestDiv.appendChild(text);
 
 					});
@@ -281,8 +317,9 @@
 
 xhttp.request('GET', mainUrl + '/myRequestsController', function(data){
 	data = JSON.parse(data);
-	incomingRequestArray(data.requestsRecieved);
-	outgoingRequestArray(data.requestsSent);
+	console.log(data);
+	incomingRequestArray(data.requestsRecieved, data.books);
+	outgoingRequestArray(data.requestsSent, data.books);
 })
 
 

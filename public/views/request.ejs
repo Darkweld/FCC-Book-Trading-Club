@@ -7,13 +7,16 @@
   
   <body>
     <div class =  "link-container">
+      <a href = "/">Home</a>
       <a href = "/profile">Profile</a>
+      <a href = "/findbooks">Find Books</a>
+      <a href = "/myRequests">Requests<% if (userRequests.length) { %> <span class = "requestNotification"><%=userRequests.length%></span><% } %></a>
       <a href = "/logout">Logout</a>
     </div>
 
-
-    <div class = 'main-request-container' id = "mainRequestDiv">
-
+    <div class = 'requestPageDiv'>
+    <p class="boldText"> Instructions: Click books to add them to your request, and click the submit button when done. </p>
+    <div class = 'main-request-container' id = "mainRequestDiv"></div>
     </div>
 
 

@@ -11,7 +11,8 @@
             var capital = i.substr(0,1).toUpperCase() + i.substr(1, i.length);
             document.getElementById(i).href = mainUrl + "/unlink/" + i;
             document.getElementById(i + "-text").innerHTML = "Unlink " + capital;
-        } 
+        }
+         
          
 }
 
@@ -52,10 +53,6 @@ function bookArray (array) {
                 tooltip.appendChild(bookAuthor);
             }
 
-            var bookUser = document.createElement('p');
-            bookUser.textContent = 'owned by: ' + array[i].user.localUsername;
-            bookUser.className = "bookUser";
-            tooltip.appendChild(bookUser);
             bookDiv.appendChild(tooltip);
 
 
@@ -81,7 +78,6 @@ function bookArray (array) {
 	var recieveprofileUrl = mainUrl + "/getUser";
 	xhttp.request("GET", recieveprofileUrl, function(data){
 			var data = JSON.parse(data);
-			console.log(data);
 			profilePage(data);
 			return bookArray(data.books);
 	});

@@ -22,6 +22,7 @@ function apiBookRequest(val) {
     		var count = 0;
     		var arr = [];
     		for (var i in json.items) {
+    			if (!json.items[i].volumeInfo.imageLinks) continue;
     			arr[count] = {
     				bookId: json.items[i].id,
     				title: json.items[i].volumeInfo.title,
@@ -184,7 +185,7 @@ function server (passport) {
 
 	this.createUsername = function(req, res) {
 		if (req.isAuthenticated()) {
-		return res.render('username');
+		return res.render('username', {user: req.user});
 	}
 		return res.render('login');
 
@@ -210,7 +211,7 @@ function server (passport) {
 			.update({'_id': req.user._id}, {'localUsername': req.params.username})
 			.exec(function(err, result) {
 					if (err) throw err;
-					return res.json({'success': 'your username is now changed'});
+					return res.json({'success': req.params.username});
 
 			});
 
@@ -307,11 +308,11 @@ function server (passport) {
     	.populate('books')
     	.then(function(reciever){
     	User
-    		.findOne({'_id': req.user._id}, {'localUsername': 1, 'books': 1})
+    		.findOne({'_id': req.user._id}, {'localUsername': 1, 'books': 1, 'requestsRecieved': 1})
     		.populate('books')
     		.exec(function(err, requester){
     			if (err) throw err;
-    			res.render('request', {reciever: JSON.stringify(reciever), requester: JSON.stringify(requester)})
+    			res.render('request', {userRequests: req.user.requestsRecieved, reciever: JSON.stringify(reciever), requester: JSON.stringify(requester)})
     		})
     	}).catch(function(reason){
     		console.log('error in requestPage findOne, reason: ' + reason);
@@ -407,7 +408,7 @@ function server (passport) {
 			.populate('requests')
 			.populate({path: 'requestsRecieved',
 				populate: [{
-					path: 'from', select: 'localUsername'
+					path: 'from', select: 'localUsername books'
 				},
 				{
 					path: 'booksOffered'
@@ -418,7 +419,7 @@ function server (passport) {
 			})
 			.populate({path: 'requestsSent',
 				populate: [{
-					path: 'to', select: 'localUsername'
+					path: 'to', select: 'localUsername books'
 				},
 				{
 					path: 'booksOffered'
