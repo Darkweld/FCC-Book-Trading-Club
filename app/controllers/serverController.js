@@ -275,7 +275,7 @@ function server (passport) {
 						book.save().then(function(bookDoc) {
 							User.update({'_id': req.user._id}, {$push: {books :bookDoc._id}})
 							.exec(function(err, userDoc) {
-								res.json({'query':'completed'});
+								res.json({'completed':'query'});
 							});
 							
 						}).catch(function(reason) {

@@ -52,7 +52,19 @@
                 }
                div.addEventListener('click', function(event) {
                    xhttp.request('POST', url, function(response) {
-                        console.log(response);
+                    var response = JSON.parse(response);
+                       if (response.error) return alert(response.error);
+                       if (document.getElementById('ownedBooks')) return document.getElementById('ownedBooks').appendChild(div);
+
+                        var ownedBookscreate = document.createElement('div');
+                        ownedBookscreate.className = 'owned-books-container';
+                        ownedBookscreate.id = 'ownedBooks'
+                        ownedBookscreate.appendChild(div);
+                        var ownedBooksText = document.createElement('p');
+                        ownedBooksText.className = 'myRequestsBigText';
+                        ownedBooksText.textContent = "Books owned by users within search results"
+                        mainContainer.insertBefore(ownedBookscreate, mainContainer.firstChild);
+                        return mainContainer.insertBefore(ownedBooksText, ownedBookscreate);
                        
                    });
                }, false);
@@ -95,6 +107,10 @@
                pagination.appendChild(paginationLink);
             }
         }
+        var mainText = document.createElement('p');
+        mainText.textContent = "Book search results";
+        mainText.className = 'myRequestsBigText';
+        mainContainer.appendChild(mainText);
         mainContainer.appendChild(pagination);
     }
 
@@ -115,6 +131,7 @@
 
                 var ownedBooks = document.createElement('div');
                 ownedBooks.className = 'owned-books-container'; 
+                ownedBooks.id = 'ownedBooks';
 
 
              for (var i = 0, l = data.ownedBooks.length; i < l; i++) {
@@ -160,6 +177,10 @@
             
             }
             ownedBooks.appendChild(fragment);
+            var ownedBooksText = document.createElement('p');
+            ownedBooksText.className = 'myRequestsBigText';
+            ownedBooksText.textContent = "Books owned by users within search results";
+            mainContainer.appendChild(ownedBooksText);
             mainContainer.appendChild(ownedBooks);
 
             return arrayLoop(data.unownedBooks);
