@@ -84,7 +84,7 @@ body {
     background-color: #80b3b3;
     border-radius: 10px;
     margin: 10px auto 10px auto;
-    padding: 5px;  
+    padding: 5px;
 }
 .profile-heading {
     font-weight: 700;
@@ -166,9 +166,9 @@ body {
 .search-error-container {
     margin: 5% auto 0 auto;
 }
-.main-book-container {
-    width: 80%;
-    margin: 10px auto 0 auto;
+.mainContainer {
+    width: 90%;
+    margin: 0 auto;
     text-align: center;
 }
 .book-container, .owned-books-container {
@@ -178,9 +178,10 @@ body {
     justify-content: center;
     flex-flow: row;
     flex-wrap: wrap;
+    padding: 10px;
 }
 .book-container {
-    background-color: #80b3b3;;
+    background-color: lightslategray;
 }
 .owned-books-container {
     background-color: #70db70;
@@ -389,3 +390,4 @@ body {
     color: red;
     font-weight: 700;
 }
+

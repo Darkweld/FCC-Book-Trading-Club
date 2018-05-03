@@ -114,7 +114,7 @@ var Main = function (_React$Component3) {
 			var _this6 = this;
 
 			var bookArray = this.state.bookData.map(function (b) {
-				return React.createElement(Book, { click: _this6.handleBookClick, imgSRC: b.image, title: b.title, author: b.authors,
+				return React.createElement(Book, { key: b._id, click: _this6.handleBookClick, imgSRC: b.image, title: b.title, author: b.authors,
 					userName: b.user.localUsername });
 			});
 
@@ -124,7 +124,7 @@ var Main = function (_React$Component3) {
 				React.createElement(
 					"h1",
 					{ className: "title" },
-					" \"FreeCodeCamp book club by \"",
+					"FreeCodeCamp book club by ",
 					React.createElement(
 						"a",
 						{ className: "userLink", href: "https://github.com/Darkweld" },
@@ -134,7 +134,7 @@ var Main = function (_React$Component3) {
 				React.createElement(
 					"p",
 					{ className: "boldText" },
-					"\"Click a book to request a book from a user.\""
+					"Click a book to request a book from a user."
 				),
 				React.createElement(
 					"div",
@@ -149,6 +149,7 @@ var Main = function (_React$Component3) {
 }(React.Component);
 
 ReactDOM.render(React.createElement(Main, null), document.getElementById("root"));
+
 
 },{"react":24,"react-dom":21}],2:[function(require,module,exports){
 /**
